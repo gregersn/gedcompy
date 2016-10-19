@@ -183,6 +183,81 @@ family.children.father_relation # String 'Natural'
 family.children.mother_relation # string 'Natural'
 ```
 
+### Residence
+Residence records
+
+```python
+>>> for person in gedfile.individuals
+...			print person.residence
+# Residence(1, 'RESI', 'Marital Status: SingleRelation to Head of House: Son', [Element(2, 'DATE', '1910'), Element(2, 'PLAC', 'Lowell Ward 6, Middlesex, Massachusetts, USA'), Source(2, 'SOUR', '@S1002094821@', [Element(3, 'PAGE', 'Year: 1910; Census Place: Lowell Ward 6, Middlesex, Massachusetts; Roll: T624_600; Page: 33A; Enumeration District: 0864; FHL microfilm: 1374613'), Element(3, '_APID', '1,7884::108099427')])])
+>>> for person in gedfile.individuals
+...			print person.residence.date
+...			print person.residence.source
+# 1910
+# @S100243564@
+```
+
+Use cases for children
+
+##### current available use cases
+```
+residence.date
+residence.id
+residence.note
+residence.parent_id
+residence.place
+residence.source
+residence.value
+```
+
+```python
+>>> for person in gedfile.individuals:
+...     try:
+...         print person.birth.place
+...     except AttributeError:
+...         print "There is no birth place record for this person"
+# There is no birth place record for this person
+# Brooklyn, New York City, New York, USA
+```
+
+###### current available use cases
+
+```
+family.id                       # string '@F49@'
+family.tag                      # string 'FAM'
+family.partners                 # list 
+family.wife                     # class - wife
+family.husband                  # class - husband
+family.children                 # list
+family.children.father_relation # String 'Natural'
+family.children.mother_relation # string 'Natural'
+```
+
+### Residence
+Residence records
+
+```python
+>>> for person in gedfile.individuals
+...     print person.residence
+# Residence(1, 'RESI', 'Marital Status: SingleRelation to Head of House: Son', [Element(2, 'DATE', '1910'), Element(2, 'PLAC', 'Lowell Ward 6, Middlesex, Massachusetts, USA'), Source(2, 'SOUR', '@S1002094821@', [Element(3, 'PAGE', 'Year: 1910; Census Place: Lowell Ward 6, Middlesex, Massachusetts; Roll: T624_600; Page: 33A; Enumeration District: 0864; FHL microfilm: 1374613'), Element(3, '_APID', '1,7884::108099427')])])
+>>> for person in gedfile.individuals
+...     print person.residence.date
+...     print person.residence.source
+# 1910
+# @S100243564@
+```
+
+##### current available use cases
+```
+residence.date
+residence.id
+residence.note
+residence.parent_id
+residence.place
+residence.source
+residence.value
+```
+
 ### Error Handling
 By default, if a record doesn't exist an error will be raised and will not continue onto the rest of the records. This is on purpose, but can by bypassed by using try/except cases. The most common errors that are raised are IndexError and AttributeError
 
@@ -195,6 +270,7 @@ By default, if a record doesn't exist an error will be raised and will not conti
 # There is no birth place record for this person
 # Brooklyn, New York City, New York, USA
 ```
+
 ```python
 >>> for family in gedfile.families:
 ...     try:
