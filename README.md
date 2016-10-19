@@ -168,8 +168,6 @@ Use cases for partners:
 # Wife(1, 'WIFE', '@P1@')
 ```
 
-Use cases for children
-
 ##### current available use cases
 
 ```
@@ -197,8 +195,6 @@ Residence records
 # @S100243564@
 ```
 
-Use cases for children
-
 ##### current available use cases
 ```
 residence.date
@@ -220,7 +216,7 @@ residence.value
 # Brooklyn, New York City, New York, USA
 ```
 
-###### current available use cases
+##### current available use cases
 
 ```
 family.id                       # string '@F49@'
