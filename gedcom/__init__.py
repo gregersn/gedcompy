@@ -562,10 +562,10 @@ class Individual(Element):
         Get the source of information for that element
 
         :returns: source info
-        :rtype: string
+        :rtype:pyclass: `Source`
         :raises :AttributeError: if there is no source info
         """
-        return self['SOUR'].value
+        return self['SOUR']
 
     @property
     def note(self):
@@ -796,7 +796,13 @@ class Event(Element):
         :returns: source info
         :rtype: string
         """
-        return self['SOUR'].value
+        return self['SOUR']
+
+
+@register_tag("PAGE")
+class Page(Event):
+    """Represents source information"""
+    pass
 
 @register_tag("RESI")
 class Residence(Event):
@@ -824,11 +830,49 @@ class Marriage(Event):
 
     pass
 
+@register_tag("TEXT")
+class Reference(Element):
+    """represents source reference"""
+    pass
+
+@register_tag("DATA")
+class Data(Element):
+    """represents source reference level"""
+
+    @property
+    def reference(self):
+        """
+        get the source reference for that element
+
+        :returns: source reference
+        :rtype: string
+        """
+        return self['TEXT'].value
+
+
 @register_tag("SOUR")
 class Source(Element):
-    """Represents an information source"""
-    
-    pass
+    """Represents an information source element"""
+ 
+    @property
+    def page(self):
+        """
+        Get the page of source information for that element
+
+        :returns: page info
+        :rtype: string
+        """
+        return self['PAGE'].value  
+
+    @property
+    def data(self):
+        """
+        get the data of the source info for that element
+
+        :returns: data element
+        :rtype:pyclass:`Data`
+        """
+        return self['DATA']
 
 @register_tag("NOTE")
 class Note(Element):
