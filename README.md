@@ -226,6 +226,7 @@ As noted previously, sources can also be nested within an individuals element as
 
 ##### current available use cases
 ```
+source.value
 source.page
 source.data
 source.data.reference
