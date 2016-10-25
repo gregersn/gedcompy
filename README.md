@@ -218,7 +218,7 @@ As noted previously, sources can also be nested within an individuals element as
 >>>for person in gedfile.individuals:
 ... 		print person.source.page
 ... 		print person.source.data
-... 		print person.source.data.reference
+... 		print person.source.data.text
 # Ancestry Family Tree
 # Data(2, 'DATA', [Reference(3, 'TEXT', 'http://trees.ancestry.com/pt/AMTCitationRedir.aspx?tid=12345678&pid=21')])
 # http://trees.ancestry.com/pt/AMTCitationRedir.aspx?tid=12345678&pid=21
@@ -229,7 +229,7 @@ As noted previously, sources can also be nested within an individuals element as
 source.value
 source.page
 source.data
-source.data.reference
+source.data.text
 ```
 
 ### Error Handling

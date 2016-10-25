@@ -831,7 +831,7 @@ class Marriage(Event):
     pass
 
 @register_tag("TEXT")
-class Reference(Element):
+class Text(Element):
     """represents source reference"""
     pass
 
@@ -840,7 +840,7 @@ class Data(Element):
     """represents source reference level"""
 
     @property
-    def reference(self):
+    def text(self):
         """
         get the source reference for that element
 
