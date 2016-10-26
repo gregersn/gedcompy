@@ -604,7 +604,6 @@ class Individual(Element):
         """
         get any event about an individual
 
-
         :returns: events
         :rtype: list of :py:class: `Happening` for his individual
         :raises: AttributeError: if there is no record
@@ -623,7 +622,7 @@ class Individual(Element):
 
         :returns: burial
         :rtype: :py:class: `Burial`
-        :raises: AttributeError: if there is no record
+        :raises: IndexError: if there is no record for this individual
         """
         return self['BURI']
 
@@ -634,9 +633,12 @@ class Individual(Element):
         
         :returns: divorce records
         :rtype: py:class: `Divorce`
+        :raises: AttributeError: if there is no record for this individual
         """
-        return self.get_list("DIV")
-
+        if (len(self.get_list("DIV")) == 0):
+            raise AttributeError, "No Divorce record for this person"
+        else:
+            return self.get_list("DIV")
 
 
 @register_tag("FAM")
@@ -651,42 +653,26 @@ class Family(Element):
         :rtype: list of Husband or Wives
         """
         return self.get_list("HUSB") + self.get_list("WIFE")
-
-    @property
-    def marriage(self):
-        """
-        Return the :py:class: `Marriage` for this object
-        
-        :return: marriage record
-        :raises IndexError: If there is no record
-        :rtype: :py:class:`Marriage`
-        """
-        marriage_record = self.get_list("MARR")
-        return marriage_record[0]
-    
+   
     @property
     def wife(self):
         """
-        Return the :py:class:`Wife` for this object.
+        Return the wife records for this element
 
-        :return: wife
-        :raises IndexError: If there is no record
-        :rtype: :py:class:`Wife`
+        :return: wife records
+        :rtype: list of :py:class: `Wife`
         """
-        wife = self.get_list("WIFE")
-        return wife[0]
+        return self.get_list("WIFE")
 
     @property
     def husband(self):
         """
-        Return the :py:class:`Husband` for this object.
+        Return the husband records for this element
 
         :return: husband
-        :raises IndexError: If there is no record
-        :rtype: :py:class:`Husband`
+        :rtype: list of :py:class: `Husband`
         """
-        husband = self.get_list("HUSB")
-        return husband[0]
+        return self.get_list("HUSB")
 
     @property
     def children(self):
@@ -694,8 +680,7 @@ class Family(Element):
         Return a list of children for this object.
 
         :return: children
-        :raises IndexError: If there is no record of this type
-        :rtype: list
+        :rtype: list of :py:class: `Child`
         """
         return self.get_list("CHIL")
 
@@ -704,19 +689,13 @@ class Family(Element):
         """
         Return a list of marriage records. all MARR child elements.
 
-        :rtype: list of Marriage information
+        :return: marriages
+        :rtype: list of :py:class: `Marriage` information
         """
         return self.get_list("MARR")
 
-    @property
-    def husband(self):
-        return self.get_list("HUSB")
-
-    @property
-    def wife(self):
-        return self.get_list("WIFE")
-
  
+@register_tag("FAMS")
 class Spouse(Element):
     """Generic base class for HUSB/WIFE."""
 
@@ -730,20 +709,7 @@ class Spouse(Element):
         """
         return self.gedcom_file[self.value]
 
-
-@register_tag("HUSB")
-class Husband(Spouse):
-    """Represents pointer to a husband in a family."""
-
-    pass
-
-
-@register_tag("WIFE")
-class Wife(Spouse):
-    """Represents pointer to a wife in a family."""
-
-    pass
-
+@register_tag("FAMC")
 class Children(Element):
     """ Generic base class for CHIL """
 
@@ -791,6 +757,20 @@ class Children(Element):
             raise NotImplementedError()
 
 
+@register_tag("HUSB")
+class Husband(Spouse):
+    """Represents pointer to a husband in a family."""
+
+    pass
+
+
+@register_tag("WIFE")
+class Wife(Spouse):
+    """Represents pointer to a wife in a family."""
+
+    pass
+
+
 @register_tag("_FREL")
 class Father_Relation(Children):
     """Represents pointer to a father relation"""
@@ -809,8 +789,6 @@ class Child(Children):
     """Represents pointer to a child in a family"""
 
     pass
-
-
 
 class Event(Element):
     """Generic base class for events, like :py:class:`Birth` (BIRT) etc."""
@@ -854,7 +832,7 @@ class Event(Element):
 
 @register_tag("EVEN")
 class Happening(Element):
-    """Represents an Event (EVEN)"""
+    """Represents an Event, other than birth, etc. (EVEN)"""
 
     @property
     def type(self):
@@ -942,13 +920,7 @@ class Source(Element):
         :returns: data element
         :rtype:pyclass:`Data`
         """
-        return self['DATA']
-
-
-@register_tag("PAGE")
-class Page(Source):
-    """Represents source information"""
-    pass
+        return self['DATA'].text
 
 
 @register_tag("DATA")
@@ -965,20 +937,40 @@ class Data(Source):
         """
         return self['TEXT'].value
 
-    @property
-    def data(self):
-        """
-        get the data of the source info for that element
-
-        :returns: data element
-        :rtype:pyclass:`Data`
-        """
-        return self['DATA']
-
-
 @register_tag("TEXT")
 class Text(Data):
     """represents source reference"""
+    
+    pass
+
+@register_tag("PAGE")
+class Page(Source):
+    """Represents source information"""
+
+    pass
+
+@register_tag("DATE")
+class Date(Event):
+    """Represents a pointer to a date value"""
+
+    pass
+
+@register_tag("PLAC")
+class Place(Event):
+    """Represents a pointer to a place entry"""
+
+    pass
+
+@register_tag("SEX")
+class Sex(Individual):
+    """Represents a pointer to a sex entry"""
+
+    pass
+
+@register_tag("NAME")
+class Name(Individual):
+    """Represents a pointer to a name entry"""
+
     pass
 
 
