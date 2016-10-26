@@ -627,6 +627,17 @@ class Individual(Element):
         """
         return self['BURI']
 
+    @property
+    def divorce(self):
+        """
+        return a list of divorce records
+        
+        :returns: divorce records
+        :rtype: py:class: `Divorce`
+        """
+        return self.get_list("DIV")
+
+
 
 @register_tag("FAM")
 class Family(Element):
@@ -900,6 +911,12 @@ class Burial(Event):
 @register_tag("MARR")
 class Marriage(Event):
     """Represents a marriage (MARR)."""
+
+    pass
+
+@register_tag("DIV")
+class Divorce(Event):
+    """Represents a divorce (DIV)"""
 
     pass
 
