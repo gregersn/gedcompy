@@ -607,7 +607,7 @@ class Individual(Element):
 
         :returns: events
         :rtype: list of :py:class: `Happening` for his individual
-        :raises : AttributeError: if there is no record
+        :raises: AttributeError: if there is no record
         """
         happening = []
         if (type(self['EVEN']) == list):
@@ -615,6 +615,17 @@ class Individual(Element):
         else:
             happening.append(self['EVEN'])
         return happening
+
+    @property
+    def burial(self):
+        """
+        get burial information for an individual
+
+        :returns: burial
+        :rtype: :py:class: `Burial`
+        :raises: AttributeError: if there is no record
+        """
+        return self['BURI']
 
 
 @register_tag("FAM")
@@ -823,7 +834,12 @@ class Event(Element):
         :returns: source info
         :rtype: string
         """
-        return self['SOUR']
+        source = []
+        if (type(self['SOUR']) == list):
+            return self['SOUR']
+        else:
+            source.append(self['SOUR'])
+        return source
 
 @register_tag("EVEN")
 class Happening(Element):
@@ -855,11 +871,6 @@ class Type(Happening):
     """Represents a type of event"""
     pass
 
-@register_tag("PAGE")
-class Page(Event):
-    """Represents source information"""
-    pass
-
 @register_tag("RESI")
 class Residence(Event):
     """Represents an individuals residence"""
@@ -876,6 +887,12 @@ class Birth(Event):
 @register_tag("DEAT")
 class Death(Event):
     """Represents a death (DEAT)."""
+
+    pass
+
+@register_tag("BURI")
+class Burial(Event):
+    """Represents burial information (BURI)"""
 
     pass
 
@@ -909,6 +926,12 @@ class Source(Element):
         :rtype:pyclass:`Data`
         """
         return self['DATA']
+
+
+@register_tag("PAGE")
+class Page(Source):
+    """Represents source information"""
+    pass
 
 
 @register_tag("DATA")
