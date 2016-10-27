@@ -659,20 +659,26 @@ class Family(Element):
         """
         Return the wife records for this element
 
-        :return: wife records
-        :rtype: list of :py:class: `Wife`
+        :return: wife or none if there are no wife records
+        :rtype: :py:class: `Wife`
         """
-        return self.get_list("WIFE")
+        if (len(self.get_list("WIFE")) == 0):
+            return None
+        else:
+            return self.get_list("WIFE")[0]
 
     @property
     def husband(self):
         """
         Return the husband records for this element
 
-        :return: husband
-        :rtype: list of :py:class: `Husband`
+        :return: husband or None if there are no husband records
+        :rtype: :py:class: `Husband`
         """
-        return self.get_list("HUSB")
+        if (len(self.get_list("HUSB")) == 0):
+            return None
+        else:
+            return self.get_list("HUSB")[0]
 
     @property
     def children(self):
@@ -831,7 +837,7 @@ class Event(Element):
         return source
 
 @register_tag("EVEN")
-class Happening(Element):
+class Happening(Event):
     """Represents an Event, other than birth, etc. (EVEN)"""
 
     @property
@@ -852,7 +858,12 @@ class Happening(Element):
         :returns: source info
         :rtype: string
         """
-        return self['SOUR']
+        source = []
+        if (type(self['SOUR']) == list):
+            return self['SOUR']
+        else:
+            source.append(self['SOUR'])
+        return source
 
 
 @register_tag("TYPE")
