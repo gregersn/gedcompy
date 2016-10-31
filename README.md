@@ -185,14 +185,14 @@ family.children.mother_relation # string 'Natural'
 Residence records
 
 ```python
->>> for person in gedfile.individuals
+>>> for person in gedfile.individuals:
 ...			print person.residence
 # Residence(1, 'RESI', 'Marital Status: SingleRelation to Head of House: Son', [Element(2, 'DATE', '1910'), Element(2, 'PLAC', 'Lowell Ward 6, Middlesex, Massachusetts, USA'), Source(2, 'SOUR', '@S1002094821@', [Element(3, 'PAGE', 'Year: 1910; Census Place: Lowell Ward 6, Middlesex, Massachusetts; Roll: T624_600; Page: 33A; Enumeration District: 0864; FHL microfilm: 1374613'), Element(3, '_APID', '1,7884::108099427')])])
->>> for person in gedfile.individuals
+>>> for person in gedfile.individuals:
 ...			print person.residence.date
-...			print person.residence.source
+...			print person.residence.place
 # 1910
-# @S100243564@
+# Wilmington Ward 3, New Hanover, North Carolina, USA
 ```
 
 ##### current available use cases
@@ -204,6 +204,32 @@ residence.parent_id
 residence.place
 residence.source
 residence.value
+```
+
+###Sources
+Source records
+This gets into more deeply nested elements.
+As noted previously, sources can also be nested within an individuals element as well as recorded for the individual themself. 
+
+```python
+>>> for person in gedfile.individuals:
+... 		print person.source
+#  Source(1, 'SOUR', '@S-357352754@', [Page(2, 'PAGE', 'Ancestry Family Tree'), Data(2, 'DATA', [Reference(3, 'TEXT', 'http://trees.ancestry.com/pt/AMTCitationRedir.aspx?tid=12345678&pid=21')])])
+>>>for person in gedfile.individuals:
+... 		print person.source.page
+... 		print person.source.data
+... 		print person.source.data.text
+# Ancestry Family Tree
+# Data(2, 'DATA', [Reference(3, 'TEXT', 'http://trees.ancestry.com/pt/AMTCitationRedir.aspx?tid=12345678&pid=21')])
+# http://trees.ancestry.com/pt/AMTCitationRedir.aspx?tid=12345678&pid=21
+```
+
+##### current available use cases
+```
+source.value
+source.page
+source.data
+source.data.text
 ```
 
 ### Error Handling

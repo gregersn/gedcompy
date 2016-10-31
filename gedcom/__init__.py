@@ -562,10 +562,15 @@ class Individual(Element):
         Get the source of information for that element
 
         :returns: source info
-        :rtype: string
+        :rtype: list of  `Source` classes
         :raises :AttributeError: if there is no source info
         """
-        return self['SOUR'].value
+        source = []
+        if (type(self['SOUR']) == list):
+            return self['SOUR']
+        else:
+            source.append(self['SOUR'])
+        return source
 
     @property
     def note(self):
@@ -587,7 +592,53 @@ class Individual(Element):
         :rtype: :py:class: `Residence`
         :raises :AttributeError: if there is no residence record
         """
-        return self['RESI']
+        residence = []
+        if (type(self['RESI']) == list):
+            return self['RESI']
+        else:
+            residence.append(self['RESI'])
+        return residence
+
+    @property
+    def happening(self):
+        """
+        get any event about an individual
+
+        :returns: events
+        :rtype: list of :py:class: `Happening` for his individual
+        :raises: AttributeError: if there is no record
+        """
+        happening = []
+        if (type(self['EVEN']) == list):
+            return self['EVEN']
+        else:
+            happening.append(self['EVEN'])
+        return happening
+
+    @property
+    def burial(self):
+        """
+        get burial information for an individual
+
+        :returns: burial
+        :rtype: :py:class: `Burial`
+        :raises: IndexError: if there is no record for this individual
+        """
+        return self['BURI']
+
+    @property
+    def divorce(self):
+        """
+        return a list of divorce records
+        
+        :returns: divorce records
+        :rtype: py:class: `Divorce`
+        :raises: AttributeError: if there is no record for this individual
+        """
+        if (len(self.get_list("DIV")) == 0):
+            raise AttributeError, "No Divorce record for this person"
+        else:
+            return self.get_list("DIV")
 
 
 @register_tag("FAM")
@@ -602,42 +653,32 @@ class Family(Element):
         :rtype: list of Husband or Wives
         """
         return self.get_list("HUSB") + self.get_list("WIFE")
-
-    @property
-    def marriage(self):
-        """
-        Return the :py:class: `Marriage` for this object
-        
-        :return: marriage record
-        :raises IndexError: If there is no record
-        :rtype: :py:class:`Marriage`
-        """
-        marriage_record = self.get_list("MARR")
-        return marriage_record[0]
-    
+   
     @property
     def wife(self):
         """
-        Return the :py:class:`Wife` for this object.
+        Return the wife records for this element
 
-        :return: wife
-        :raises IndexError: If there is no record
-        :rtype: :py:class:`Wife`
+        :return: wife or none if there are no wife records
+        :rtype: :py:class: `Wife`
         """
-        wife = self.get_list("WIFE")
-        return wife[0]
+        if (len(self.get_list("WIFE")) == 0):
+            return None
+        else:
+            return self.get_list("WIFE")[0]
 
     @property
     def husband(self):
         """
-        Return the :py:class:`Husband` for this object.
+        Return the husband records for this element
 
-        :return: husband
-        :raises IndexError: If there is no record
-        :rtype: :py:class:`Husband`
+        :return: husband or None if there are no husband records
+        :rtype: :py:class: `Husband`
         """
-        husband = self.get_list("HUSB")
-        return husband[0]
+        if (len(self.get_list("HUSB")) == 0):
+            return None
+        else:
+            return self.get_list("HUSB")[0]
 
     @property
     def children(self):
@@ -645,8 +686,7 @@ class Family(Element):
         Return a list of children for this object.
 
         :return: children
-        :raises IndexError: If there is no record of this type
-        :rtype: list
+        :rtype: list of :py:class: `Child`
         """
         return self.get_list("CHIL")
 
@@ -655,19 +695,13 @@ class Family(Element):
         """
         Return a list of marriage records. all MARR child elements.
 
-        :rtype: list of Marriage information
+        :return: marriages
+        :rtype: list of :py:class: `Marriage` information
         """
         return self.get_list("MARR")
 
-    @property
-    def husband(self):
-        return self.get_list("HUSB")
-
-    @property
-    def wife(self):
-        return self.get_list("WIFE")
-
  
+@register_tag("FAMS")
 class Spouse(Element):
     """Generic base class for HUSB/WIFE."""
 
@@ -681,20 +715,7 @@ class Spouse(Element):
         """
         return self.gedcom_file[self.value]
 
-
-@register_tag("HUSB")
-class Husband(Spouse):
-    """Represents pointer to a husband in a family."""
-
-    pass
-
-
-@register_tag("WIFE")
-class Wife(Spouse):
-    """Represents pointer to a wife in a family."""
-
-    pass
-
+@register_tag("FAMC")
 class Children(Element):
     """ Generic base class for CHIL """
 
@@ -742,6 +763,20 @@ class Children(Element):
             raise NotImplementedError()
 
 
+@register_tag("HUSB")
+class Husband(Spouse):
+    """Represents pointer to a husband in a family."""
+
+    pass
+
+
+@register_tag("WIFE")
+class Wife(Spouse):
+    """Represents pointer to a wife in a family."""
+
+    pass
+
+
 @register_tag("_FREL")
 class Father_Relation(Children):
     """Represents pointer to a father relation"""
@@ -760,8 +795,6 @@ class Child(Children):
     """Represents pointer to a child in a family"""
 
     pass
-
-
 
 class Event(Element):
     """Generic base class for events, like :py:class:`Birth` (BIRT) etc."""
@@ -796,7 +829,47 @@ class Event(Element):
         :returns: source info
         :rtype: string
         """
-        return self['SOUR'].value
+        source = []
+        if (type(self['SOUR']) == list):
+            return self['SOUR']
+        else:
+            source.append(self['SOUR'])
+        return source
+
+@register_tag("EVEN")
+class Happening(Event):
+    """Represents an Event, other than birth, etc. (EVEN)"""
+
+    @property
+    def type(self):
+        """
+        Get the type of event that occurs
+
+        :returns: event type
+        :rtype: string
+        """
+        return self['TYPE'].value
+
+    @property
+    def source(self):
+        """
+        Get the source of information for that element
+
+        :returns: source info
+        :rtype: string
+        """
+        source = []
+        if (type(self['SOUR']) == list):
+            return self['SOUR']
+        else:
+            source.append(self['SOUR'])
+        return source
+
+
+@register_tag("TYPE")
+class Type(Happening):
+    """Represents a type of event"""
+    pass
 
 @register_tag("RESI")
 class Residence(Event):
@@ -817,6 +890,12 @@ class Death(Event):
 
     pass
 
+@register_tag("BURI")
+class Burial(Event):
+    """Represents burial information (BURI)"""
+
+    pass
+
 
 @register_tag("MARR")
 class Marriage(Event):
@@ -824,11 +903,87 @@ class Marriage(Event):
 
     pass
 
+@register_tag("DIV")
+class Divorce(Event):
+    """Represents a divorce (DIV)"""
+
+    pass
+
 @register_tag("SOUR")
 class Source(Element):
-    """Represents an information source"""
+    """Represents an information source element"""
+ 
+    @property
+    def page(self):
+        """
+        Get the page of source information for that element
+
+        :returns: page info
+        :rtype: string
+        """
+        return self['PAGE'].value  
+
+    @property
+    def data(self):
+        """
+        get the data of the source info for that element
+
+        :returns: data element
+        :rtype:pyclass:`Data`
+        """
+        return self['DATA'].text
+
+
+@register_tag("DATA")
+class Data(Source):
+    """represents source reference level"""
+
+    @property
+    def text(self):
+        """
+        get the source reference for that element
+
+        :returns: source reference
+        :rtype: string
+        """
+        return self['TEXT'].value
+
+@register_tag("TEXT")
+class Text(Data):
+    """represents source reference"""
     
     pass
+
+@register_tag("PAGE")
+class Page(Source):
+    """Represents source information"""
+
+    pass
+
+@register_tag("DATE")
+class Date(Event):
+    """Represents a pointer to a date value"""
+
+    pass
+
+@register_tag("PLAC")
+class Place(Event):
+    """Represents a pointer to a place entry"""
+
+    pass
+
+@register_tag("SEX")
+class Sex(Individual):
+    """Represents a pointer to a sex entry"""
+
+    pass
+
+@register_tag("NAME")
+class Name(Individual):
+    """Represents a pointer to a name entry"""
+
+    pass
+
 
 @register_tag("NOTE")
 class Note(Element):
