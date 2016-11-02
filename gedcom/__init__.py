@@ -600,20 +600,20 @@ class Individual(Element):
         return residence
 
     @property
-    def happening(self):
+    def event(self):
         """
         get any event about an individual
 
         :returns: events
-        :rtype: list of :py:class: `Happening` for his individual
+        :rtype: list of :py:class: `Event` for his individual
         :raises: AttributeError: if there is no record
         """
-        happening = []
+        event = []
         if (type(self['EVEN']) == list):
             return self['EVEN']
         else:
-            happening.append(self['EVEN'])
-        return happening
+            event.append(self['EVEN'])
+        return event 
 
     @property
     def burial(self):
@@ -796,6 +796,7 @@ class Child(Children):
 
     pass
 
+@register_tag("EVEN")
 class Event(Element):
     """Generic base class for events, like :py:class:`Birth` (BIRT) etc."""
 
@@ -836,10 +837,6 @@ class Event(Element):
             source.append(self['SOUR'])
         return source
 
-@register_tag("EVEN")
-class Happening(Event):
-    """Represents an Event, other than birth, etc. (EVEN)"""
-
     @property
     def type(self):
         """
@@ -867,7 +864,7 @@ class Happening(Event):
 
 
 @register_tag("TYPE")
-class Type(Happening):
+class Type(Event):
     """Represents a type of event"""
     pass
 
@@ -876,13 +873,11 @@ class Residence(Event):
     """Represents an individuals residence"""
     pass
 
-
 @register_tag("BIRT")
 class Birth(Event):
     """Represents a birth (BIRT)."""
 
     pass
-
 
 @register_tag("DEAT")
 class Death(Event):
@@ -896,7 +891,6 @@ class Burial(Event):
 
     pass
 
-
 @register_tag("MARR")
 class Marriage(Event):
     """Represents a marriage (MARR)."""
@@ -908,6 +902,20 @@ class Divorce(Event):
     """Represents a divorce (DIV)"""
 
     pass
+
+@register_tag("DATE")
+class Date(Event):
+    """Represents a pointer to a date value"""
+
+    pass
+
+@register_tag("PLAC")
+class Place(Event):
+    """Represents a pointer to a place entry"""
+
+    pass
+
+
 
 @register_tag("SOUR")
 class Source(Element):
@@ -957,18 +965,6 @@ class Text(Data):
 @register_tag("PAGE")
 class Page(Source):
     """Represents source information"""
-
-    pass
-
-@register_tag("DATE")
-class Date(Event):
-    """Represents a pointer to a date value"""
-
-    pass
-
-@register_tag("PLAC")
-class Place(Event):
-    """Represents a pointer to a place entry"""
 
     pass
 
