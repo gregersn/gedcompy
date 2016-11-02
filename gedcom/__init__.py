@@ -915,7 +915,107 @@ class Place(Event):
 
     pass
 
+@register_tag("BAPL")
+class Baptism_LDS(Event):
+    """Represents a baptism of the LDS Churc"""
 
+    pass
+
+@register_tag("BAPM")
+class Baptism(Event):
+    """Represents a non-LDS baptism"""
+
+    pass
+
+@register_tag("BARM")
+class Bar_Mitzvah(Event):
+    """Represents a Bar Mitzvah"""
+
+    pass
+
+@register_tag("BASM")
+class Bas_Mitzvah(Event):
+    """Represents a Bas Mitzvah"""
+
+    pass
+
+@register_tag("BLES")
+class Blessing(Event):
+    """Represents a blessing"""
+
+    pass
+
+@register_tag("CHR")
+class Christening(Event):
+    """Represents a Christening"""
+
+    pass
+
+@register_tag("CHRA")
+class Adult_Christening(Event):
+    """Represents an adult Christening"""
+
+    pass
+
+@register_tag("CONF")
+class Confirmation(Event):
+    """Represents a Christening"""
+
+    pass
+
+@register_tag("CONL")
+class LDS_Confirmation(Event):
+    """Represents a Christening of the LDS Churc"""
+
+    pass
+
+@register_tag("CREM")
+class Cremation(Event):
+    """Represents a Cremation"""
+
+    pass
+
+@register_tag("EMIG")
+class Emigration(Event):
+    """Represents an Emigration"""
+
+    pass
+
+@register_tag("ENDL")
+class Endowment(Event):
+    """Represents an Endowment"""
+
+    pass
+
+@register_tag("ENGA")
+class Engagement(Event):
+    """Represents an Engagement"""
+
+    pass
+
+@register_tag("GRAD")
+class Graduation(Event):
+    """Represents a Graduation"""
+
+    pass
+
+@register_tag("IMMI")
+class Immigration(Event):
+    """Represents an Immigration"""
+
+    pass
+
+@register_tag("NATU")
+class Naturalization(Event):
+    """Represents a naturalization"""
+
+    pass
+
+@register_tag("WILL")
+class Will(Event):
+    """Represents a Will - treated as an event"""
+
+    pass
 
 @register_tag("SOUR")
 class Source(Element):
