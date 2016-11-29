@@ -11,6 +11,9 @@ It's goal is to support GEDCOM v5.5 (<a href='http://homepages.rootsweb.ancestry
 
 This is released under the GNU General Public Licence version 3 (or at your option, a later version). See the file `LICENCE` for more.
 
+## installation
+from the terminal, run `python setup.py build && python setup.py install`
+
 ## gedcompy Usage:
 gedcompy parses out the records of each person and stores them as nested objects, accesible through dot notation.
 
