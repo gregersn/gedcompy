@@ -388,6 +388,8 @@ class Individual(Element):
         :returns: (firstname, lastname)
         """
         name_tag = self['NAME']
+        first = '' 
+        last = ''
 
         if isinstance(name_tag, list):
             # We have more than one name, get the preferred name
@@ -699,7 +701,6 @@ class Family(Element):
         :rtype: list of :py:class: `Marriage` information
         """
         return self.get_list("MARR")
-
  
 @register_tag("FAMS")
 class Spouse(Element):
