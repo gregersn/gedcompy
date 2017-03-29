@@ -362,18 +362,28 @@ class Individual(Element):
     def parents(self):
         """
         Return list of parents of this person.
+        Gedcom standard allows for a person to be the child of more than one family, whether the data makes sense or is accurate, we handle this by returning all `Individual` elements. 
 
         NB: There may be 0, 1, 2, 3, ... elements in this list.
 
         :returns: List of Individual's
         """
         if 'FAMC' in self:
-            family_as_child_id = self['FAMC'].value
-            family = self.get_by_id(family_as_child_id)
-            if not any(child.value == self.id for child in family.get_list("CHIL")):
-                # raise Exception("Invalid family", family, self)
-                pass
-            parents = family.partners
+            famc = []
+            if type(self['FAMC']) != list:
+                famc.append(self['FAMC'])
+            else:
+                famc = self['FAMC']
+
+            parents = []
+            for fam in famc:
+                family_as_child_id = fam.value
+                family = self.get_by_id(family_as_child_id)
+                if not any(child.value == self.id for child in family.get_list("CHIL")):
+                    # raise Exception("Invalid family", family, self)
+                    pass
+                for fp in family.partners:
+                    parents.append(fp)
             parents = [p.as_individual() for p in parents]
             return parents
         else:
@@ -388,7 +398,7 @@ class Individual(Element):
         :returns: (firstname, lastname)
         """
         name_tag = self['NAME']
-        first = '' 
+        first = ''
         last = ''
 
         if isinstance(name_tag, list):
@@ -457,12 +467,24 @@ class Individual(Element):
     @property
     def birth(self):
         """Class representing the birth of this person."""
-        return self['BIRT']
+        if self['BIRT'] == None:
+            raise AttributeError, "No birth record available for this person"
+        else:
+            if type(self['BIRT']) != list:
+                return self['BIRT']
+            else:
+                return self['BIRT'][0]
 
     @property
     def death(self):
         """Class representing the death of this person."""
-        return self['DEAT']
+        if self['DEAT'] == None:
+            raise AttributeError, "No death record available for this person"
+        else:
+            if type(self['DEAT']) != list:
+                return self['DEAT']
+            else:
+                return self['DEAT'][0]
 
     @property
     def sex(self):
@@ -503,7 +525,9 @@ class Individual(Element):
         elif len(male_parents) == 1:
             return male_parents[0]
         elif len(male_parents) > 1:
-            raise NotImplementedError()
+            # TODO: return ALL parents, not caring who the father actually is, only relying on the data that is provided.
+            #  raise NotImplementedError()
+            return male_parents[0]
 
     @property
     def mother(self):
@@ -522,7 +546,9 @@ class Individual(Element):
         elif len(female_parents) == 1:
             return female_parents[0]
         elif len(female_parents) > 1:
-            raise NotImplementedError()
+            # TODO: return ALL parents, not caring who the mother actually is, only relying on the data that is provided.
+            #  raise NotImplementedError()
+            return female_parents[0]
 
     @property
     def is_female(self):
@@ -556,7 +582,7 @@ class Individual(Element):
         try:
             return self['TITL'].value
         except:
-            return None
+            raise AttributeError, "No title record for this person"
 
     @property
     def source(self):
@@ -595,27 +621,33 @@ class Individual(Element):
         :raises :AttributeError: if there is no residence record
         """
         residence = []
-        if (type(self['RESI']) == list):
-            return self['RESI']
+        if self['RESI'] == None:
+            raise AttributeError, "No Residence record for this person"
         else:
-            residence.append(self['RESI'])
-        return residence
+            if (type(self['RESI']) == list):
+                return self['RESI']
+            else:
+                residence.append(self['RESI'])
+            return residence
 
     @property
-    def happening(self):
+    def event(self):
         """
         get any event about an individual
 
         :returns: events
-        :rtype: list of :py:class: `Happening` for his individual
+        :rtype: list of :py:class: `Event` for his individual
         :raises: AttributeError: if there is no record
         """
-        happening = []
-        if (type(self['EVEN']) == list):
-            return self['EVEN']
+        event = []
+        if self['EVEN'] == None:
+            raise AttributeError, "No event record for this perso"
         else:
-            happening.append(self['EVEN'])
-        return happening
+            if (type(self['EVEN']) == list):
+                return self['EVEN']
+            else:
+                event.append(self['EVEN'])
+            return event
 
     @property
     def burial(self):
@@ -626,13 +658,16 @@ class Individual(Element):
         :rtype: :py:class: `Burial`
         :raises: IndexError: if there is no record for this individual
         """
-        return self['BURI']
+        if self['BURI'] == None:
+            raise AttributeError, "No burial record for this person"
+        else:
+            return self['BURI']
 
     @property
     def divorce(self):
         """
         return a list of divorce records
-        
+
         :returns: divorce records
         :rtype: py:class: `Divorce`
         :raises: AttributeError: if there is no record for this individual
@@ -641,6 +676,248 @@ class Individual(Element):
             raise AttributeError, "No Divorce record for this person"
         else:
             return self.get_list("DIV")
+
+    # TODO need to add properties/return cases for events
+    @property
+    def baptism_lds(self):
+        """
+        return records of baptism of the LDS church
+        ['BAPL']
+
+        :returns: LDS baptism records
+        :rtype: TBD
+        :raises: AttributeError: if there is no record for this individual
+        """
+        if (len(self.get_list("BAPL")) == 0):
+            raise AttributeError, "No LDS Baptism record for this person"
+        else:
+            return self.get_list("BAPL")[0]
+
+    @property
+    def baptism(self):
+        """
+        return records of Baptism
+        ['BAPM']
+
+        :returns: baptism records
+        :rtype: $
+        :raises: AttributeError: if there is no record for this individual
+        """
+        if (len(self.get_list("BAPM")) == 0):
+            raise AttributeError, "No baptism record for this person"
+        else:
+            return self.get_list("BAPM")[0]
+
+    @property
+    def bar_mitzvah(self):
+        """
+        return records of Bar_Mitzvah
+        ['BARM']
+
+        :returns: bar_mitzvah records
+        :rtype: $
+        :raises: AttributeError: if there is no record for this individual
+        """
+        if (len(self.get_list("BARM")) == 0):
+            raise AttributeError, "No Bar Mitzvah record for this person"
+        else:
+            return self.get_list("BARM")[0]
+
+    @property
+    def bas_mitzvah(self):
+        """
+        ['BASM']
+
+        :returns: bas_mitzvah records
+        :rtype: $
+        :raises: AttributeError: if there is no record for this individual
+        """
+        if (len(self.get_list("BASM")) == 0):
+            raise AttributeError, "No Bas Mitzvah record for this person"
+        else:
+            return self.get_list("BASM")[0]
+
+    @property
+    def blessing(self):
+        """
+        ['BLES']
+
+        :returns: blessing records
+        :rtype: $
+        :raises: AttributeError: if there is no record for this individual
+        """
+        if (len(self.get_list("BLES")) == 0):
+            raise AttributeError, "No blessing record for this person"
+        else:
+            return self.get_list("BLES")[0]
+
+    @property
+    def christening(self):
+        """
+        ['CHR']
+
+        :returns: christening records
+        :rtype: $
+        :raises: AttributeError: if there is no record for this individual
+        """
+        if (len(self.get_list("CHR")) == 0):
+            raise AttributeError, "No Christening record for this person"
+        else:
+            return self.get_list("CHR")[0]
+
+    @property
+    def adult_christening(self):
+        """
+        ['CHRA']
+
+        :returns: adult christening
+        :rtype: $
+        :raises: AttributeError: if there is no record for this individual
+        """
+        if (len(self.get_list("CHRA")) == 0):
+            raise AttributeError, "No Adult Christening record for this person"
+        else:
+            return self.get_list("CHRA")[0]
+
+    @property
+    def confirmation(self):
+        """
+        ['CONF']
+
+        :returns: confirmation records
+        :rtype: $
+        :raises: AttributeError: if there is no record for this individual
+        """
+        if (len(self.get_list("CONF")) == 0):
+            raise AttributeError, "No Confirmation record for this person"
+        else:
+            return self.get_list("CONF")[0]
+
+    @property
+    def confirmation_lds(self):
+        """
+        ['CONL']
+
+        :returns: lds church confirmation records
+        :rtype: $
+        :raises: AttributeError: if there is no record for this individual
+        """
+        if (len(self.get_list("CONL")) == 0):
+            raise AttributeError, "No LDS Confirmation record for this person"
+        else:
+            return self.get_list("CONL")[0]
+
+    @property
+    def cremation(self):
+        """
+        ['CREM']
+
+        :returns: records of cremation
+        :rtype: $
+        :raises: AttributeError: if there is no record for this individual
+        """
+        if (len(self.get_list("CREM")) == 0):
+            raise AttributeError, "No Cremation record for this person"
+        else:
+            return self.get_list("CREM")[0]
+
+    @property
+    def emigration(self):
+        """
+        ['EMIG']
+
+        :returns: emigration records
+        :rtype: $
+        :raises: AttributeError: if there is no record for this individual
+        """
+        if (len(self.get_list("EMIG")) == 0):
+            raise AttributeError, "No Emigration record for this person"
+        else:
+            return self.get_list("EMIG")[0]
+
+    @property
+    def endowment(self):
+        """
+        ['ENDL']
+
+        :returns: endowment records
+        :rtype: $
+        :raises: AttributeError: if there is no record for this individual
+        """
+        if (len(self.get_list("ENDL")) == 0):
+            raise AttributeError, "No Endowment record for this person"
+        else:
+            return self.get_list("ENDL")[0]
+
+    @property
+    def engagement(self):
+        """
+        ['ENGA']
+
+        :returns: engagement records
+        :rtype: $
+        :raises: AttributeError: if there is no record for this individual
+        """
+        if (len(self.get_list("ENGA")) == 0):
+            raise AttributeError, "No Engagement record for this person"
+        else:
+            return self.get_list("ENGA")[0]
+
+    @property
+    def graduation(self):
+        """
+        ['GRAD']
+
+        :returns: graduation records
+        :rtype: $
+        :raises: AttributeError: if there is no record for this individual
+        """
+        if (len(self.get_list("GRAD")) == 0):
+            raise AttributeError, "No Graduation record for this person"
+        else:
+            return self.get_list("GRAD")[0]
+
+    @property
+    def immigration(self):
+        """
+        ['IMMI']
+
+        :returns: immigration records
+        :rtype: $
+        :raises: AttributeError: if there is no record for this individual
+        """
+        if (len(self.get_list("IMMI")) == 0):
+            raise AttributeError, "No Immigration record for this person"
+        else:
+            return self.get_list("IMMI")[0]
+
+    @property
+    def naturalization(self):
+        """
+        ['NATU']
+
+        :returns: naturalization records
+        :rtype: $
+        :raises: AttributeError: if there is no record for this individual
+        """
+        if (len(self.get_list("NATU")) == 0):
+            raise AttributeError, "No Naturalization record for this person"
+        else:
+            return self.get_list("NATU")[0]
+
+    @property
+    def will(self):
+        """
+        ['WILL']
+
+        :returns: will records
+        :rtype: $
+        :raises: AttributeError: if there is no record for this individual
+        """
+        if (len(self.get_list("WILL")) == 0):
+            raise AttributeError, "No Will record for this person"
+        else:
+            return self.get_list("WILL")[0]
 
 
 @register_tag("FAM")
@@ -655,7 +932,7 @@ class Family(Element):
         :rtype: list of Husband or Wives
         """
         return self.get_list("HUSB") + self.get_list("WIFE")
-   
+
     @property
     def wife(self):
         """
@@ -701,7 +978,8 @@ class Family(Element):
         :rtype: list of :py:class: `Marriage` information
         """
         return self.get_list("MARR")
- 
+
+
 @register_tag("FAMS")
 class Spouse(Element):
     """Generic base class for HUSB/WIFE."""
@@ -797,6 +1075,7 @@ class Child(Children):
 
     pass
 
+@register_tag("EVEN")
 class Event(Element):
     """Generic base class for events, like :py:class:`Birth` (BIRT) etc."""
 
@@ -837,10 +1116,6 @@ class Event(Element):
             source.append(self['SOUR'])
         return source
 
-@register_tag("EVEN")
-class Happening(Event):
-    """Represents an Event, other than birth, etc. (EVEN)"""
-
     @property
     def type(self):
         """
@@ -868,7 +1143,7 @@ class Happening(Event):
 
 
 @register_tag("TYPE")
-class Type(Happening):
+class Type(Event):
     """Represents a type of event"""
     pass
 
@@ -877,13 +1152,11 @@ class Residence(Event):
     """Represents an individuals residence"""
     pass
 
-
 @register_tag("BIRT")
 class Birth(Event):
     """Represents a birth (BIRT)."""
 
     pass
-
 
 @register_tag("DEAT")
 class Death(Event):
@@ -897,7 +1170,6 @@ class Burial(Event):
 
     pass
 
-
 @register_tag("MARR")
 class Marriage(Event):
     """Represents a marriage (MARR)."""
@@ -910,10 +1182,124 @@ class Divorce(Event):
 
     pass
 
+@register_tag("DATE")
+class Date(Event):
+    """Represents a pointer to a date value"""
+
+    pass
+
+@register_tag("PLAC")
+class Place(Event):
+    """Represents a pointer to a place entry"""
+
+    pass
+
+@register_tag("BAPL")
+class Baptism_LDS(Event):
+    """Represents a baptism of the LDS Church"""
+
+    pass
+
+@register_tag("BAPM")
+class Baptism(Event):
+    """Represents a non-LDS baptism"""
+
+    pass
+
+@register_tag("BARM")
+class Bar_Mitzvah(Event):
+    """Represents a Bar Mitzvah"""
+
+    pass
+
+@register_tag("BASM")
+class Bas_Mitzvah(Event):
+    """Represents a Bas Mitzvah"""
+
+    pass
+
+@register_tag("BLES")
+class Blessing(Event):
+    """Represents a blessing"""
+
+    pass
+
+@register_tag("CHR")
+class Christening(Event):
+    """Represents a Christening"""
+
+    pass
+
+@register_tag("CHRA")
+class Adult_Christening(Event):
+    """Represents an adult Christening"""
+
+    pass
+
+@register_tag("CONF")
+class Confirmation(Event):
+    """Represents a Christening"""
+
+    pass
+
+@register_tag("CONL")
+class LDS_Confirmation(Event):
+    """Represents a Christening of the LDS Churc"""
+
+    pass
+
+@register_tag("CREM")
+class Cremation(Event):
+    """Represents a Cremation"""
+
+    pass
+
+@register_tag("EMIG")
+class Emigration(Event):
+    """Represents an Emigration"""
+
+    pass
+
+@register_tag("ENDL")
+class Endowment(Event):
+    """Represents an Endowment"""
+
+    pass
+
+@register_tag("ENGA")
+class Engagement(Event):
+    """Represents an Engagement"""
+
+    pass
+
+@register_tag("GRAD")
+class Graduation(Event):
+    """Represents a Graduation"""
+
+    pass
+
+@register_tag("IMMI")
+class Immigration(Event):
+    """Represents an Immigration"""
+
+    pass
+
+@register_tag("NATU")
+class Naturalization(Event):
+    """Represents a naturalization"""
+
+    pass
+
+@register_tag("WILL")
+class Will(Event):
+    """Represents a Will - treated as an event"""
+
+    pass
+
 @register_tag("SOUR")
 class Source(Element):
     """Represents an information source element"""
- 
+
     @property
     def page(self):
         """
@@ -922,7 +1308,7 @@ class Source(Element):
         :returns: page info
         :rtype: string
         """
-        return self['PAGE'].value  
+        return self['PAGE'].value
 
     @property
     def data(self):
@@ -952,24 +1338,12 @@ class Data(Source):
 @register_tag("TEXT")
 class Text(Data):
     """represents source reference"""
-    
+
     pass
 
 @register_tag("PAGE")
 class Page(Source):
     """Represents source information"""
-
-    pass
-
-@register_tag("DATE")
-class Date(Event):
-    """Represents a pointer to a date value"""
-
-    pass
-
-@register_tag("PLAC")
-class Place(Event):
-    """Represents a pointer to a place entry"""
 
     pass
 
