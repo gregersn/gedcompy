@@ -11,6 +11,15 @@ It's goal is to support GEDCOM v5.5 (<a href='http://homepages.rootsweb.ancestry
 
 This is released under the GNU General Public Licence version 3 (or at your option, a later version). See the file `LICENCE` for more.
 
+## Requirements
+* `python2.7`
+* <a href='https://pypi.python.org/pypi/pip'>`pip`</a> (package installer python, included in python download)
+* <a href='https://docs.python.org/2/library/datetime.html#strftime-and-strptime-behavior'>`datetime`</a> (pip install datetime)
+* `six` (pip install six)
+
+## Installation
+from the terminal, run `python setup.py build && python setup.py install`
+
 ## gedcompy Usage:
 gedcompy parses out the records of each person and stores them as nested objects, accesible through dot notation.
 

@@ -362,18 +362,28 @@ class Individual(Element):
     def parents(self):
         """
         Return list of parents of this person.
+        Gedcom standard allows for a person to be the child of more than one family, whether the data makes sense or is accurate, we handle this by returning all `Individual` elements. 
 
         NB: There may be 0, 1, 2, 3, ... elements in this list.
 
         :returns: List of Individual's
         """
         if 'FAMC' in self:
-            family_as_child_id = self['FAMC'].value
-            family = self.get_by_id(family_as_child_id)
-            if not any(child.value == self.id for child in family.get_list("CHIL")):
-                # raise Exception("Invalid family", family, self)
-                pass
-            parents = family.partners
+            famc = []
+            if type(self['FAMC']) != list:
+                famc.append(self['FAMC'])
+            else:
+                famc = self['FAMC']
+
+            parents = []
+            for fam in famc:
+                family_as_child_id = fam.value
+                family = self.get_by_id(family_as_child_id)
+                if not any(child.value == self.id for child in family.get_list("CHIL")):
+                    # raise Exception("Invalid family", family, self)
+                    pass
+                for fp in family.partners:
+                    parents.append(fp)
             parents = [p.as_individual() for p in parents]
             return parents
         else:
@@ -388,6 +398,8 @@ class Individual(Element):
         :returns: (firstname, lastname)
         """
         name_tag = self['NAME']
+        first = ''
+        last = ''
 
         if isinstance(name_tag, list):
             # We have more than one name, get the preferred name
@@ -513,7 +525,9 @@ class Individual(Element):
         elif len(male_parents) == 1:
             return male_parents[0]
         elif len(male_parents) > 1:
-            raise NotImplementedError()
+            # TODO: return ALL parents, not caring who the father actually is, only relying on the data that is provided.
+            #  raise NotImplementedError()
+            return male_parents[0]
 
     @property
     def mother(self):
@@ -532,7 +546,9 @@ class Individual(Element):
         elif len(female_parents) == 1:
             return female_parents[0]
         elif len(female_parents) > 1:
-            raise NotImplementedError()
+            # TODO: return ALL parents, not caring who the mother actually is, only relying on the data that is provided.
+            #  raise NotImplementedError()
+            return female_parents[0]
 
     @property
     def is_female(self):
