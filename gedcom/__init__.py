@@ -1463,6 +1463,9 @@ def __parse(lines_iter):
     gedcom_file = GedcomFile()
 
     for linenum, line in enumerate(lines_iter):
+        if linenum == 0 and repr(line).strip()[0] != '0':
+            line = '0 HEAD'
+
         line = line.strip()
         if line == '':
             continue
