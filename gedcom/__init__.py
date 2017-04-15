@@ -490,12 +490,16 @@ class Individual(Element):
     def sex(self):
         """
         Return the sex of this person, as the string 'M' or 'F'.
+        Return empty string if nothing can be found
 
         NB: This should probably support more sexes/genders.
 
         :rtype: str
         """
-        return self['SEX'].value
+        try:
+            return self['SEX'].value
+        except AttributeError:
+            return ''
 
     @property
     def gender(self):
@@ -559,6 +563,16 @@ class Individual(Element):
     def is_male(self):
         """Return True iff this person is recorded as male."""
         return self.sex.lower() == 'm'
+
+    @property
+    def has_father(self):
+        """Return True iff this preson has a father record"""
+        return self.father != None
+
+    @property
+    def has_mother(self):
+        """Return True iff this preson has a mother record"""
+        return self.mother != None
 
     def set_sex(self, sex):
         """
@@ -641,7 +655,7 @@ class Individual(Element):
         """
         event = []
         if self['EVEN'] == None:
-            raise AttributeError, "No event record for this perso"
+            raise AttributeError, "No event record for this person"
         else:
             if (type(self['EVEN']) == list):
                 return self['EVEN']
@@ -958,6 +972,24 @@ class Family(Element):
             return None
         else:
             return self.get_list("HUSB")[0]
+
+    @property
+    def has_husband(self):
+        if (len(self.get_list("HUSB")) > 0):
+            return True
+        else:
+            return False
+
+    @property
+    def has_wife(self):
+        if (len(self.get_list("WIFE")) > 0):
+            return True
+        else:
+            return False
+
+    @property
+    def has_children(self):
+        pass
 
     @property
     def children(self):
