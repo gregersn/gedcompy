@@ -1,9 +1,9 @@
+# -*- coding: utf8 -*-
 """
 Library for reading and writing GEDCOM files.
 
 https://en.wikipedia.org/wiki/GEDCOM
 """
-# -*- coding: utf8 -*-
 
 from __future__ import absolute_import
 from __future__ import unicode_literals
@@ -17,7 +17,8 @@ import six
 
 from ._version import __version__
 
-line_format = re.compile("^(?P<level>[0-9]+) ((?P<id>@[-a-zA-Z0-9]+@) )?(?P<tag>[_A-Z0-9]+)( (?P<value>.*))?$")
+line_format = re.compile("^(?P<level>[0-9]+) ((?P<id>@[-a-zA-Z0-9]+@) )" +
+                         "?(?P<tag>[_A-Z0-9]+)( (?P<value>.*))?$")
 
 
 class GedcomFile(object):
@@ -30,8 +31,10 @@ class GedcomFile(object):
         self.next_free_id = 1
 
     def __repr__(self):
-        """String represenation of GEDCOM. For internal debugging purposes only."""
-        return "GedcomFile(\n" + ",\n".join(repr(c) for c in self.root_elements) + ")"
+        """String represenation of GEDCOM.
+        For internal debugging purposes only."""
+        return "GedcomFile(\n" + ",\n".join(repr(c)
+                                            for c in self.root_elements) + ")"
 
     def __getitem__(self, key):
         """
@@ -48,13 +51,16 @@ class GedcomFile(object):
         """
         Add an Element to this file.
 
-        If element.level is unset, it'll presume it's a top level element, and set the level and id appropriately.
+        If element.level is unset, it'll presume it's a top level element,
+        and set the level and id appropriately.
 
         :param :py:class:`Element` element: Element to add
         """
         if element.level is None:
             # Need to figure out an element
-            if not (isinstance(element, Individual) or isinstance(element, Family) or element.tag in ['INDI', 'FAM']):
+            if not (isinstance(element, Individual) or
+                    isinstance(element, Family) or
+                    element.tag in ['INDI', 'FAM']):
                 raise TypeError()
             element.level = 0
             element.set_levels_downward()
@@ -68,7 +74,8 @@ class GedcomFile(object):
                 raise NotImplementedError()
 
             for step in range(1, 1000000):
-                potential_id = "@{prefix}{num}@".format(prefix=prefix, num=self.next_free_id)
+                potential_id = "@{prefix}{num}@".format(prefix=prefix,
+                                                        num=self.next_free_id)
                 if potential_id in self.pointers:
                     # this number is taken, increase
                     self.next_free_id += 1
@@ -130,7 +137,7 @@ class GedcomFile(object):
         """
         return "\n".join(self.gedcom_lines())
 
-    def save(self, fileout):
+    def save(self, fileout, overwrite=False):
         """
         Save the contents of this GEDCOM file to specified filename or file-like object.
 
@@ -138,7 +145,7 @@ class GedcomFile(object):
         :raises Exception: if the filename exists
         """
         if isinstance(fileout, six.string_types):
-            if os.path.exists(fileout):
+            if os.path.exists(fileout) and not overwrite:
                 # TODO better exception
                 raise Exception("File exists")
             else:
@@ -162,7 +169,7 @@ class GedcomFile(object):
             source.add_child_element(self.element("NAME", value="gedcompy"))
             source.add_child_element(self.element("VERS", value=__version__))
             head_element.add_child_element(source)
-            head_element.add_child_element(self.element("CHAR", value="UNICODE"))
+            head_element.add_child_element(self.element("CHAR", value="UTF-8"))
 
             gedcom_format = self.element("GEDC")
             gedcom_format.add_child_element(self.element("VERS", value="5.5"))
@@ -217,7 +224,10 @@ class Element(object):
     Can be used as is, or subclassed for specific functionality.
     """
 
-    def __init__(self, level=None, tag=None, value=None, id=None, parent_id=None, parent=None, gedcom_file=None):
+    def __init__(self, level=None,
+                 tag=None, value=None,
+                 id=None, parent_id=None,
+                 parent=None, gedcom_file=None):
         """
         Create an element.
 
@@ -369,7 +379,9 @@ class Individual(Element):
     def parents(self):
         """
         Return list of parents of this person.
-        Gedcom standard allows for a person to be the child of more than one family, whether the data makes sense or is accurate, we handle this by returning all `Individual` elements. 
+        Gedcom standard allows for a person to be the child of more than one family,
+        whether the data makes sense or is accurate,
+        we handle this by returning all `Individual` elements. 
 
         NB: There may be 0, 1, 2, 3, ... elements in this list.
 
@@ -1453,7 +1465,7 @@ def parse_filename(filename):
     :param string filename: Filename to parse
     :returns: GedcomFile instance
     """
-    with open(filename, 'r') as fp:
+    with open(filename, 'r', encoding='utf-8') as fp:
         return __parse(fp.readlines())
 
 
@@ -1517,10 +1529,15 @@ def __parse(lines_iter):
         if level == 0:
             parent = None
         else:
-            level_to_obj = dict((l, obj) for l, obj in level_to_obj.items() if l < level)
+            level_to_obj = dict((l, obj)
+                                for l, obj in level_to_obj.items()
+                                if l < level)
             parent = level_to_obj[level - 1]
 
-        element = line_to_element(level=level, parent=parent, tag=match.groupdict()['tag'], value=match.groupdict()['value'], id=match.groupdict()['id'])
+        element = line_to_element(level=level, parent=parent,
+                                  tag=match.groupdict()['tag'],
+                                  value=match.groupdict()['value'],
+                                  id=match.groupdict()['id'])
         level_to_obj[level] = element
         element.gedcom_file = gedcom_file
         gedcom_file.add_element(element)
