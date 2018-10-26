@@ -261,7 +261,19 @@ class Element(object):
         return "{classname}({level}, {tag!r}{id}{value}{children})".format(
             classname=self.__class__.__name__, level=self.level, tag=self.tag, id=(", " + repr(self.id) if self.id else ""),
             value=(", " + repr(self.value) if self.value else ""), children=(", " + repr(self.child_elements) if len(self.child_elements) > 0 else ""))
+    
+    def to_dict(self):
+        output = {
+            'level': self.level,
+            'tag': self.tag,
+            'id': self.id,
+            'value': self.value,
+        }
 
+        for el in self.child_elements:
+            output[el.tag] = el.to_dict()
+
+        return output
     def __getitem__(self, key):
         """
         Get the child element that has ``key`` as a tag.
