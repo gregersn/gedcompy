@@ -1,5 +1,5 @@
 from .element import Element, register_tag
-
+from .family import Family
 
 @register_tag("INDI")
 class Individual(Element):
@@ -11,7 +11,7 @@ class Individual(Element):
         Return list of parents of this person.
         Gedcom standard allows for a person to be the child of more than one family,
         whether the data makes sense or is accurate,
-        we handle this by returning all `Individual` elements. 
+        we handle this by returning all `Individual` elements.
 
         NB: There may be 0, 1, 2, 3, ... elements in this list.
 
@@ -585,3 +585,42 @@ class Name(Individual):
     """Represents a pointer to a name entry"""
 
     pass
+
+
+def search_children(start: Individual, target: Individual):
+    if 'FAMS' not in start:
+        return None
+
+    family = start['FAMS'].as_individual()
+
+    for child in family.children:
+        if child.as_individual() == target:
+            return [start, target, ]
+        
+        res = search_children(child.as_individual(), target)
+        if res is not None:
+            return [start, ] + res
+
+    return None
+
+
+def search(start: Individual, target: Individual):
+    if start == target:
+        return [target, ]
+
+    parents = start.parents
+    for parent in parents:
+        res = search(parent, target)
+        if res is not None:
+            return [start, ] + res
+
+    res = search_children(start, target)
+    if res is not None:
+        return res
+
+    return None
+
+
+def connection(indi1: Individual, indi2: Individual):
+    res = search(indi1, indi2)
+    return res
