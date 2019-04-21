@@ -274,6 +274,7 @@ class Element(object):
             output[el.tag] = el.to_dict()
 
         return output
+
     def __getitem__(self, key):
         """
         Get the child element that has ``key`` as a tag.
@@ -499,7 +500,7 @@ class Individual(Element):
     def birth(self):
         """Class representing the birth of this person."""
         if self['BIRT'] == None:
-            raise AttributeError("No birth record available for this person")
+            return None
         else:
             if type(self['BIRT']) != list:
                 return self['BIRT']
@@ -510,7 +511,7 @@ class Individual(Element):
     def death(self):
         """Class representing the death of this person."""
         if self['DEAT'] == None:
-            raise AttributeError("No death record available for this person")
+            return None
         else:
             if type(self['DEAT']) != list:
                 return self['DEAT']
@@ -627,7 +628,7 @@ class Individual(Element):
         try:
             return self['TITL'].value
         except:
-            raise AttributeError("No title record for this person")
+            return None
 
     @property
     def source(self):
@@ -667,7 +668,7 @@ class Individual(Element):
         """
         residence = []
         if self['RESI'] == None:
-            raise AttributeError("No Residence record for this person")
+            return None
         else:
             if (type(self['RESI']) == list):
                 return self['RESI']
@@ -686,7 +687,7 @@ class Individual(Element):
         """
         event = []
         if self['EVEN'] == None:
-            raise AttributeError("No event record for this person")
+            return None
         else:
             if (type(self['EVEN']) == list):
                 return self['EVEN']
@@ -704,7 +705,7 @@ class Individual(Element):
         :raises: IndexError: if there is no record for this individual
         """
         if self['BURI'] == None:
-            raise AttributeError("No burial record for this person")
+            return None
         else:
             return self['BURI']
 
@@ -718,7 +719,7 @@ class Individual(Element):
         :raises: AttributeError: if there is no record for this individual
         """
         if (len(self.get_list("DIV")) == 0):
-            raise AttributeError("No Divorce record for this person")
+            return None
         else:
             return self.get_list("DIV")
 
@@ -734,7 +735,7 @@ class Individual(Element):
         :raises: AttributeError: if there is no record for this individual
         """
         if (len(self.get_list("BAPL")) == 0):
-            raise AttributeError("No LDS Baptism record for this person")
+            return None
         else:
             return self.get_list("BAPL")[0]
 
@@ -749,7 +750,7 @@ class Individual(Element):
         :raises: AttributeError: if there is no record for this individual
         """
         if (len(self.get_list("BAPM")) == 0):
-            raise AttributeError("No baptism record for this person")
+            return None
         else:
             return self.get_list("BAPM")[0]
 
@@ -764,7 +765,7 @@ class Individual(Element):
         :raises: AttributeError: if there is no record for this individual
         """
         if (len(self.get_list("BARM")) == 0):
-            raise AttributeError("No Bar Mitzvah record for this person")
+            return None
         else:
             return self.get_list("BARM")[0]
 
@@ -778,7 +779,7 @@ class Individual(Element):
         :raises: AttributeError: if there is no record for this individual
         """
         if (len(self.get_list("BASM")) == 0):
-            raise AttributeError("No Bas Mitzvah record for this person")
+            return None
         else:
             return self.get_list("BASM")[0]
 
@@ -792,7 +793,7 @@ class Individual(Element):
         :raises: AttributeError: if there is no record for this individual
         """
         if (len(self.get_list("BLES")) == 0):
-            raise AttributeError("No blessing record for this person")
+            return None
         else:
             return self.get_list("BLES")[0]
 
@@ -806,7 +807,7 @@ class Individual(Element):
         :raises: AttributeError: if there is no record for this individual
         """
         if (len(self.get_list("CHR")) == 0):
-            raise AttributeError("No Christening record for this person")
+            return None
         else:
             return self.get_list("CHR")[0]
 
@@ -820,7 +821,7 @@ class Individual(Element):
         :raises: AttributeError: if there is no record for this individual
         """
         if (len(self.get_list("CHRA")) == 0):
-            raise AttributeError("No Adult Christening record for this person")
+            return None
         else:
             return self.get_list("CHRA")[0]
 
@@ -834,7 +835,7 @@ class Individual(Element):
         :raises: AttributeError: if there is no record for this individual
         """
         if (len(self.get_list("CONF")) == 0):
-            raise AttributeError("No Confirmation record for this person")
+            return None
         else:
             return self.get_list("CONF")[0]
 
@@ -848,7 +849,7 @@ class Individual(Element):
         :raises: AttributeError: if there is no record for this individual
         """
         if (len(self.get_list("CONL")) == 0):
-            raise AttributeError("No LDS Confirmation record for this person")
+            return None
         else:
             return self.get_list("CONL")[0]
 
@@ -862,7 +863,7 @@ class Individual(Element):
         :raises: AttributeError: if there is no record for this individual
         """
         if (len(self.get_list("CREM")) == 0):
-            raise AttributeError("No Cremation record for this person")
+            return None
         else:
             return self.get_list("CREM")[0]
 
@@ -876,7 +877,7 @@ class Individual(Element):
         :raises: AttributeError: if there is no record for this individual
         """
         if (len(self.get_list("EMIG")) == 0):
-            raise AttributeError("No Emigration record for this person")
+            return None
         else:
             return self.get_list("EMIG")[0]
 
@@ -890,7 +891,7 @@ class Individual(Element):
         :raises: AttributeError: if there is no record for this individual
         """
         if (len(self.get_list("ENDL")) == 0):
-            raise AttributeError("No Endowment record for this person")
+            return None
         else:
             return self.get_list("ENDL")[0]
 
@@ -904,7 +905,7 @@ class Individual(Element):
         :raises: AttributeError: if there is no record for this individual
         """
         if (len(self.get_list("ENGA")) == 0):
-            raise AttributeError("No Engagement record for this person")
+            return None
         else:
             return self.get_list("ENGA")[0]
 
@@ -918,7 +919,7 @@ class Individual(Element):
         :raises: AttributeError: if there is no record for this individual
         """
         if (len(self.get_list("GRAD")) == 0):
-            raise AttributeError("No Graduation record for this person")
+            return None
         else:
             return self.get_list("GRAD")[0]
 
@@ -932,7 +933,7 @@ class Individual(Element):
         :raises: AttributeError: if there is no record for this individual
         """
         if (len(self.get_list("IMMI")) == 0):
-            raise AttributeError("No Immigration record for this person")
+            return None
         else:
             return self.get_list("IMMI")[0]
 
@@ -946,7 +947,7 @@ class Individual(Element):
         :raises: AttributeError: if there is no record for this individual
         """
         if (len(self.get_list("NATU")) == 0):
-            raise AttributeError("No Naturalization record for this person")
+            return None
         else:
             return self.get_list("NATU")[0]
 
@@ -960,7 +961,7 @@ class Individual(Element):
         :raises: AttributeError: if there is no record for this individual
         """
         if (len(self.get_list("WILL")) == 0):
-            raise AttributeError("No Will record for this person")
+            return None
         else:
             return self.get_list("WILL")[0]
 
@@ -1151,7 +1152,8 @@ class Event(Element):
         :rtype: string
         :raises KeyError: if there is no DATE sub-element
         """
-        return self['DATE'].value
+        if self['DATE']:
+            return self['DATE'].value
 
     @property
     def place(self):
