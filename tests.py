@@ -47,6 +47,7 @@ GEDCOM_FILE = """0 HEAD
 0 TRLR
 """
 
+
 def v(string):
     return string.format(version=gedcom.__version__)
 
@@ -61,64 +62,63 @@ class GedComTestCase(unittest.TestCase):
         self.assertTrue(len(people), 3)
 
         bob = people[0]
-        self.assertEquals(bob.name, ("Robert", "Cox"))
-        self.assertEquals(bob.aka, [("Bob", "Cox"), ('Rob', 'Cox')])
-        self.assertEquals(bob.sex, 'M')
-        self.assertEquals(bob.gender, 'M')
+        self.assertEqual(bob.name, ("Robert", "Cox"))
+        self.assertEqual(bob.aka, [("Bob", "Cox"), ('Rob', 'Cox')])
+        self.assertEqual(bob.sex, 'M')
+        self.assertEqual(bob.gender, 'M')
         self.assertTrue(bob.is_male)
         self.assertFalse(bob.is_female)
-        self.assertEquals(bob.parents, [])
-        self.assertEquals(bob.father, None)
-        self.assertEquals(bob.mother, None)
+        self.assertEqual(bob.parents, [])
+        self.assertEqual(bob.father, None)
+        self.assertEqual(bob.mother, None)
 
         joann = people[1]
-        self.assertEquals(joann.name, ("Joann", "Para"))
-        self.assertEquals(joann.sex, 'F')
-        self.assertEquals(joann.gender, 'F')
+        self.assertEqual(joann.name, ("Joann", "Para"))
+        self.assertEqual(joann.sex, 'F')
+        self.assertEqual(joann.gender, 'F')
         self.assertFalse(joann.is_male)
         self.assertTrue(joann.is_female)
-        self.assertEquals(joann.parents, [])
+        self.assertEqual(joann.parents, [])
 
         bobby_jo = people[2]
-        self.assertEquals(bobby_jo.name, ("Bobby Jo", "Cox"))
-        self.assertEquals(bobby_jo.sex, 'M')
-        self.assertEquals(bobby_jo.gender, 'M')
+        self.assertEqual(bobby_jo.name, ("Bobby Jo", "Cox"))
+        self.assertEqual(bobby_jo.sex, 'M')
+        self.assertEqual(bobby_jo.gender, 'M')
         self.assertTrue(bobby_jo.is_male)
         self.assertFalse(bobby_jo.is_female)
-        self.assertEquals(bobby_jo.parents, [bob, joann])
-        self.assertEquals(bobby_jo.father, bob)
-        self.assertEquals(bobby_jo.mother, joann)
+        self.assertEqual(bobby_jo.parents, [bob, joann])
+        self.assertEqual(bobby_jo.father, bob)
+        self.assertEqual(bobby_jo.mother, joann)
 
         families = list(parsed.families)
-        self.assertEquals(len(families), 1)
+        self.assertEqual(len(families), 1)
         family = families[0]
-        self.assertEquals(family.__class__, gedcom.Family)
-        self.assertEquals([p.as_individual() for p in family.partners], [bob, joann])
+        self.assertEqual(family.__class__, gedcom.Family)
+        self.assertEqual([p.as_individual() for p in family.partners], [bob, joann])
 
     def testCreateEmpty(self):
         gedcomfile = gedcom.GedcomFile()
-        self.assertEqual(gedcomfile.gedcom_lines_as_string(), v('0 HEAD\n1 SOUR\n2 NAME gedcompy\n2 VERS {version}\n1 CHAR UNICODE\n1 GEDC\n2 VERS 5.5\n2 FORM LINEAGE-LINKED\n0 TRLR'))
-
+        self.assertEqual(gedcomfile.gedcom_lines_as_string(), v('0 HEAD\n1 SOUR\n2 NAME gedcompy\n2 VERS {version}\n1 CHAR UTF-8\n1 GEDC\n2 VERS 5.5\n2 FORM LINEAGE-LINKED\n0 TRLR'))
 
     def testCanCreate(self):
         gedcomfile = gedcom.GedcomFile()
         individual = gedcomfile.individual()
         individual.set_sex("M")
-        self.assertEquals(individual.level, 0)
+        self.assertEqual(individual.level, 0)
 
-        self.assertEquals(list(gedcomfile.individuals)[0], individual)
+        self.assertEqual(list(gedcomfile.individuals)[0], individual)
 
-        self.assertEquals(individual.tag, 'INDI')
-        self.assertEquals(individual.level, 0)
-        self.assertEquals(individual.note, None)
+        self.assertEqual(individual.tag, 'INDI')
+        self.assertEqual(individual.level, 0)
+        self.assertEqual(individual.note, None)
 
         family = gedcomfile.family()
 
-        self.assertEquals(family.tag, 'FAM')
-        self.assertEquals(family.level, 0)
+        self.assertEqual(family.tag, 'FAM')
+        self.assertEqual(family.level, 0)
 
-        self.assertEqual(gedcomfile.gedcom_lines_as_string(), v('0 HEAD\n1 SOUR\n2 NAME gedcompy\n2 VERS {version}\n1 CHAR UNICODE\n1 GEDC\n2 VERS 5.5\n2 FORM LINEAGE-LINKED\n0 @I1@ INDI\n1 SEX M\n0 @F2@ FAM\n0 TRLR'))
-        self.assertEqual(repr(gedcomfile), v("GedcomFile(\nElement(0, 'HEAD', [Element(1, 'SOUR', [Element(2, 'NAME', 'gedcompy'), Element(2, 'VERS', '{version}')]), Element(1, 'CHAR', 'UNICODE'), Element(1, 'GEDC', [Element(2, 'VERS', '5.5'), Element(2, 'FORM', 'LINEAGE-LINKED')])]),\nIndividual(0, 'INDI', '@I1@', [Element(1, 'SEX', 'M')]),\nFamily(0, 'FAM', '@F2@'),\nElement(0, 'TRLR'))"))
+        self.assertEqual(gedcomfile.gedcom_lines_as_string(), v('0 HEAD\n1 SOUR\n2 NAME gedcompy\n2 VERS {version}\n1 CHAR UTF-8\n1 GEDC\n2 VERS 5.5\n2 FORM LINEAGE-LINKED\n0 @I1@ INDI\n1 SEX M\n0 @F2@ FAM\n0 TRLR'))
+        self.assertEqual(repr(gedcomfile), v("GedcomFile(\nElement(0, 'HEAD', [Element(1, 'SOUR', [Name(2, 'NAME', 'gedcompy'), Element(2, 'VERS', '{version}')]), Element(1, 'CHAR', 'UTF-8'), Element(1, 'GEDC', [Element(2, 'VERS', '5.5'), Element(2, 'FORM', 'LINEAGE-LINKED')])]),\nIndividual(0, 'INDI', '@I1@', [Sex(1, 'SEX', 'M')]),\nFamily(0, 'FAM', '@F2@'),\nElement(0, 'TRLR'))"))
 
     def testCanOnlyAddIndividualOrFamilyToFile(self):
         gedcomfile = gedcom.GedcomFile()
@@ -144,6 +144,7 @@ class GedComTestCase(unittest.TestCase):
         gedcomfile = gedcom.GedcomFile()
         element = gedcom.Family()
         gedcomfile.add_element(element)
+
 
     def testIndividualIdsWork(self):
         gedcomfile = gedcom.GedcomFile()
@@ -232,15 +233,15 @@ class GedComTestCase(unittest.TestCase):
         gedcomfile = gedcom.parse_string("0 HEAD\n0 @I1@ INDI\n1 NAME\n2 GIVN Bob\n2 SURN Cox\n1 BIRT\n2 DATE 1980\n2 PLAC London\n0 TRLR")
         ind = list(gedcomfile.individuals)[0]
         birth = ind.birth
-        self.assertEquals(birth.place, "London")
-        self.assertEquals(birth.date, "1980")
+        self.assertEqual(birth.place, "London")
+        self.assertEqual(birth.date, "1980")
 
     def testDeath(self):
         gedcomfile = gedcom.parse_string("0 HEAD\n0 @I1@ INDI\n1 NAME\n2 GIVN Bob\n2 SURN Cox\n1 DEAT\n2 DATE 1980\n2 PLAC London\n0 TRLR")
         ind = list(gedcomfile.individuals)[0]
         death = ind.death
-        self.assertEquals(death.place, "London")
-        self.assertEquals(death.date, "1980")
+        self.assertEqual(death.place, "London")
+        self.assertEqual(death.date, "1980")
 
     def testSetSex(self):
         gedcomfile = gedcom.GedcomFile()
