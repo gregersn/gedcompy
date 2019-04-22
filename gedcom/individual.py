@@ -1,3 +1,4 @@
+from typing import List
 from .element import Element, register_tag
 from .family import Family
 
@@ -588,6 +589,7 @@ class Name(Individual):
 
 
 def search_children(start: Individual, target: Individual):
+    best_result = None
     if 'FAMS' not in start:
         return None
 
@@ -599,12 +601,38 @@ def search_children(start: Individual, target: Individual):
         
         res = search_children(child.as_individual(), target)
         if res is not None:
-            return [start, ] + res
+            if best_result is None or len(res) < len(best_result):
+                best_result = [start, ] + res
 
-    return None
+    return best_result
 
+
+def search_siblings(start: Individual, target: Individual):
+    best_result = None
+    if 'FAMC' not in start:
+        return None
+    
+    if start == target:
+        return [target, ]
+    
+    family = start['FAMC'].as_individual()
+    for child in family.children:
+        if child.as_individual() == start:
+            continue
+
+        if child.as_individual() == target:
+            return [start, target, ]
+        
+        res = search_children(child.as_individual(), target)
+        if res is not None:
+            if best_result is None or len(res) < len(best_result):
+                best_result = [start, ] + res
+
+    return best_result
 
 def search(start: Individual, target: Individual):
+    best_result = None
+
     if start == target:
         return [target, ]
 
@@ -612,15 +640,35 @@ def search(start: Individual, target: Individual):
     for parent in parents:
         res = search(parent, target)
         if res is not None:
-            return [start, ] + res
+            if best_result is None or len(res) < len(best_result):
+                best_result = [start, ] + res
+    
+    res = search_siblings(start, target)
+    if res is not None:
+        if best_result is None or len(res) < len(best_result):
+            best_result = res
 
     res = search_children(start, target)
     if res is not None:
-        return res
+        if best_result is None or len(res) < len(best_result):
+            best_result = res
 
-    return None
+    return best_result
 
 
-def connection(indi1: Individual, indi2: Individual):
+def connection(indi1: Individual, indi2: Individual, all=True):
     res = search(indi1, indi2)
     return res
+
+
+def ancestor(individuals: List) -> Individual:
+    """Find the ancestor in a connected list of people."""
+    if len(individuals) < 2:
+        return individuals[0]
+    
+    cur, nex = individuals[0:2]
+
+    if nex in cur.parents:
+        return ancestor(individuals[1:])
+
+    return individuals[0]
