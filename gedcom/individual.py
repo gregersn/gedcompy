@@ -593,9 +593,14 @@ def search_children(start: Individual, target: Individual):
     if 'FAMS' not in start:
         return None
 
-    family = start['FAMS'].as_individual()
+    children = []
+    if type(start['FAMS']) == list:
+        for f in start['FAMS']:
+            children += f.as_individual().children
+    else:
+        children = start['FAMS'].as_individual().children
 
-    for child in family.children:
+    for child in children:
         if child.as_individual() == target:
             return [start, target, ]
         
@@ -615,8 +620,14 @@ def search_siblings(start: Individual, target: Individual):
     if start == target:
         return [target, ]
     
-    family = start['FAMC'].as_individual()
-    for child in family.children:
+    children = []
+    if type(start['FAMC']) == list:
+        for f in start['FAMC']:
+            children += f.as_individual().children
+    else:
+        children = start['FAMC'].as_individual().children
+
+    for child in children:
         if child.as_individual() == start:
             continue
 
@@ -629,6 +640,7 @@ def search_siblings(start: Individual, target: Individual):
                 best_result = [start, ] + res
 
     return best_result
+
 
 def search(start: Individual, target: Individual):
     best_result = None
@@ -661,14 +673,30 @@ def connection(indi1: Individual, indi2: Individual, all=True):
     return res
 
 
-def ancestor(individuals: List) -> Individual:
-    """Find the ancestor in a connected list of people."""
-    if len(individuals) < 2:
-        return individuals[0]
-    
-    cur, nex = individuals[0:2]
+def ancestor(individuals: List, current=None):
+    individual = individuals[0]
+    distance = 0
+    direction = 0.0
 
-    if nex in cur.parents:
-        return ancestor(individuals[1:])
+    if current is not None:
+        individual, distance, direction = current['individual'], current['distance'], current['direction']
 
-    return individuals[0]
+    if len(individuals) > 1:
+        cur, nex = individuals[0:2]
+        if nex in cur.parents:
+            distance += 1
+            if nex == cur.father:
+                direction -= 0.5 / (distance * distance)
+            elif nex == cur.mother:
+                direction += 0.5 / (distance * distance)
+            return ancestor(individuals[1:], {'individual': nex,
+                                              'distance': distance,
+                                              'direction': direction})
+    else:
+        individual = individuals[0]          
+
+    return {
+        'individual': individual,
+        'distance': distance,
+        'direction': direction
+    }
