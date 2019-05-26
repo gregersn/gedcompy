@@ -686,9 +686,9 @@ def ancestor(individuals: List, current=None):
         if nex in cur.parents:
             distance += 1
             if nex == cur.father:
-                direction -= 0.5 / (distance * distance)
+                direction -= pow(0.5, distance)
             elif nex == cur.mother:
-                direction += 0.5 / (distance * distance)
+                direction += pow(0.5, distance)
             return ancestor(individuals[1:], {'individual': nex,
                                               'distance': distance,
                                               'direction': direction})

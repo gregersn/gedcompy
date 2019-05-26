@@ -21,3 +21,4 @@ from .note import *
 from .individual import *
 from .event import *
 from .gedcomfile import *
+from .family import *
