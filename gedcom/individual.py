@@ -603,7 +603,7 @@ def search_children(start: Individual, target: Individual):
     for child in children:
         if child.as_individual() == target:
             return [start, target, ]
-        
+
         res = search_children(child.as_individual(), target)
         if res is not None:
             if best_result is None or len(res) < len(best_result):

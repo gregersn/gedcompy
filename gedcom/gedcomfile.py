@@ -36,7 +36,10 @@ class GedcomFile(object):
         :rtype: :py:class:`Element`
         :raises KeyError: If key is not in this file
         """
-        return self.pointers[key]
+        if key in self.pointers:
+            return self.pointers[key]
+        
+        return None
 
     def add_element(self, element):
         """
